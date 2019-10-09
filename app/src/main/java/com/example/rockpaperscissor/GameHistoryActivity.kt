@@ -30,6 +30,10 @@ class GameHistoryActivity : AppCompatActivity() {
         initViews()
     }
 
+    /**
+     * sets up adapter, gets games from database and sets event listeners
+     *
+     */
     private fun initViews() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -46,6 +50,11 @@ class GameHistoryActivity : AppCompatActivity() {
         ibtnDelete.setOnClickListener { onDeleteClick() }
     }
 
+    /**
+     * Method triggered when clicking on delete button
+     * All games are deleted from database within Coroutine
+     *
+     */
     private fun onDeleteClick() {
         CoroutineScope(Dispatchers.Main).launch {
             withContext(Dispatchers.IO) {
@@ -56,6 +65,10 @@ class GameHistoryActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Gets all games from the database and updates gameAdapter
+     *
+     */
     private fun getGamesFromDatabase() {
         CoroutineScope(Dispatchers.Main).launch {
             val games = withContext(Dispatchers.IO) {
@@ -67,10 +80,18 @@ class GameHistoryActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Closes current activity
+     *
+     */
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         return onBackButtonClick()
     }
 
+    /**
+     * Closes current activity
+     *
+     */
     private fun onBackButtonClick(): Boolean {
         finish()
         return true

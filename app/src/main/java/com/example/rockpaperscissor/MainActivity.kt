@@ -28,11 +28,19 @@ class MainActivity : AppCompatActivity() {
         initViews()
     }
 
+    /**
+     * Initialized all event listeners and updates game statistics
+     *
+     */
     private fun initViews() {
         initListeners()
         updateStats()
     }
 
+    /**
+     * Get wins, draws and losses with ROOM DB inside Coroutine
+     *
+     */
     private fun updateStats() {
         CoroutineScope(Dispatchers.Main).launch {
             val wins = withContext(Dispatchers.IO) {
@@ -53,6 +61,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Sets individual listeners on UI elements
+     *
+     */
     private fun initListeners() {
         ibtnHistory.setOnClickListener {
             startActivity()
@@ -62,11 +74,20 @@ class MainActivity : AppCompatActivity() {
         ibtnScissor.setOnClickListener { handleGame(Gesture.SCISSOR) }
     }
 
+    /**
+     * Method to start GameHistoryActivity
+     *
+     */
     private fun startActivity() {
         val intent = Intent(this, GameHistoryActivity::class.java)
         startActivityForResult(intent, REQUEST_CODE)
     }
 
+    /**
+     * Method to handle a single game,
+     *
+     * @param gesture Rock || Paper || Scissors chosen by user
+     */
     private fun handleGame(gesture: Gesture) {
         val computerAction = (0..3).shuffled().first()
         val computerGesture = assignGesture(computerAction)
@@ -84,6 +105,11 @@ class MainActivity : AppCompatActivity() {
         updateStats()
     }
 
+    /**
+     * Method to insert game into the database
+     *
+     * @param game Game object to be inserted
+     */
     private fun insertGameIntoDatabase(game: Game) {
         CoroutineScope(Dispatchers.Main).launch {
             withContext(Dispatchers.IO) {
@@ -92,6 +118,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Method to assign gesture to values based on enums
+     *
+     * @param value Value to match against enums
+     * @return Enum Gesture
+     */
     private fun assignGesture(value: Int): Gesture {
         return when (value) {
             0 -> Gesture.ROCK
@@ -101,6 +133,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Method to calculate the winner of a game by comparing chose action/gesture
+     *
+     * @param game Game to calculate winner from
+     * @return Returns game with game.result defined
+     */
     private fun calculateWinner(game: Game): Game {
         game.result = when {
             game.computerAction == game.userAction -> getString(R.string.draw)
@@ -114,18 +152,34 @@ class MainActivity : AppCompatActivity() {
         return game
     }
 
+    /**
+     * Displays the game results in the UI
+     *
+     * @param game Game to display results from
+     */
     private fun displayGameResults(game: Game) {
         tvResult.text = game.result
         ivComputer.setImageDrawable(getDrawable(game.computerAction.drawableId))
         ivYou.setImageDrawable(getDrawable(game.userAction.drawableId))
     }
 
+    /**
+     * Method is triggered when returning from GameHistoryActivity
+     *
+     * @param requestCode RequestCode from activity
+     * @param resultCode resultCode from activity
+     * @param data Optional data from activity
+     */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         updateStats()
         resetGameResults()
     }
 
+    /**
+     * Resets all game results on UI
+     *
+     */
     private fun resetGameResults() {
         tvResult.text = getString(R.string.initial_result)
         ivComputer.setImageDrawable(getDrawable(Gesture.PAPER.drawableId))
